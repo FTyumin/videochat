@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'project',
     'corsheaders',
-    'rest_framework'
+    'rest_framework',
+    'agora'
 ]
 
 #added code

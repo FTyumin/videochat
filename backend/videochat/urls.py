@@ -23,5 +23,6 @@ router.register(r'todos', views.VideoView, 'todo')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls))
+    path('api/', include(router.urls)),
+    path('', include('agora.urls'))
 ]
