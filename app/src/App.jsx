@@ -15,7 +15,16 @@ function App() {
           </div>
         </div>
       </div>
-      <div>
+      <div className="container my-5">
+        <div className="row">
+          <div className="col">
+            <div className="btn-group">
+
+            </div>
+
+          </div>
+
+        </div>
         
       </div>
     </div>
