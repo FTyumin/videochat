@@ -31,6 +31,22 @@ function initUserOnlineChannel() {
           }
         
     })}
+
+    userOnlineChannel.bind("pusher:member_removed", (data) => {
+        let user = data.info;
+        const leavingUserIndex = this.onlineUsers.findIndex(
+          (data) => data.id === user.id
+        );
+        this.onlineUsers.splice(leavingUserIndex, 1);
+      });
+
+      userOnlineChannel.bind("pusher:subscription_error", (err) => {
+        console.log("Subscription Error", err);
+      });
+
+      userOnlineChannel.bind("an_event", (data) => {
+        console.log("a_channel: ", data);
+      });
         
     
 

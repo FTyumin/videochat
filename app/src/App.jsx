@@ -2,7 +2,7 @@ function App() {
   
   
   return (
-    <main id="app">
+    <main id="app" className="mt-12">
       <main>
         <div className="container">
           <div className="row">
