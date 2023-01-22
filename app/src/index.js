@@ -14,14 +14,14 @@ const app = {
     
 
 
-mounted() {
+ mounted() {
   this.initUserOnlineChannel()
 },
 
-methods:
+methods: {
 
   function initUserOnlineChannel() {
-      const userOnlineChannel = pusher.subscribe("presence-online-channel")
+       let userOnlineChannel = pusher.subscribe("presence-online-channel")
 
       userOnlineChannel.bind("pusher:subscription_succeded", (data) => {
         let members = Object.keys(data.members).map((k) => data.members[k])
@@ -72,6 +72,11 @@ methods:
       }
     })
       
+  },
+
+  function getUserOnlineStatus(id){
+    const onlineUserIndex = this.onlineUsers.findIndex(
+      (data)=>data.id===id)
   }
 
     
@@ -80,6 +85,7 @@ methods:
 
 
     
+}
 }
         
     
