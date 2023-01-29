@@ -115,9 +115,9 @@ methods:
     const tokenRes = await this.generateToken(this.agoraChannel);
     this.initializeAgora(tokenRes.data.appID);
 
-    this.joinRoom(tokenRes.data.token, this.agoraChannel);
-    this.incomingCall = false;
-    this.callPlaced = true;
+    this.joinRoom(tokenRes.data.token, this.agoraChannel)
+    this.incomingCall = false
+    this.callPlaced = true
   },
 
   declineCall() {
@@ -140,18 +140,134 @@ methods:
     );
   },
 
+  // Agora events 
+  initializeAgora(agora_app_id) {
+    this.client = AgoraRTC.createClient({ mode: "rtc", codec: "h264" });
+    this.client.init(
+      agora_app_id,
+      () => {
+        console.log("AgoraRTC client initialized")
+      },
+      (err) => {
+        console.log("AgoraRTC client init failed", err)
+      }
+    );
+  },
 
+  async joinRoom(token, channel) {
+    this.client.join(
+      token,
+      channel,
+      AUTH_USER,
+      (uid) => {
+        console.log("User " + uid + " join channel successfully");
+        this.callPlaced = true
+        this.createLocalStream()
+        this.initializedAgoraListeners()
+      },
+      (err) => {
+        console.log("Join channel failed", err)
+      }
+    )
+  },
 
+  initializedAgoraListeners() {
+    //   Register event listeners
+    this.client.on("stream-published", function (evt) {
+      console.log("Publish local stream successfully")
+      console.log(evt)
+    })
 
+    this.client.on("stream-added", ({ stream }) => {
+      console.log("New stream added: " + stream.getId())
+      this.client.subscribe(stream, function (err) {
+        console.log("Subscribe stream failed", err)
+      })
+    })
 
-    
+    this.client.on("stream-subscribed", (evt) => {
+      // Attach remote stream to the remote-video div
 
-    
+      console.log("incoming remote stream event: ", evt)
 
+      evt.stream.play("remote-video")
+      this.client.publish(evt.stream)
+    })
 
-    
+    this.client.on("stream-removed", ({ stream }) => {
+      console.log(String(stream.getId()))
+      stream.close()
+    })
+
+    this.client.on("peer-online", (evt) => {
+      console.log("peer-online", evt.uid)
+    })
+
+    this.client.on("peer-leave", (evt) => {
+      var uid = evt.uid
+      var reason = evt.reason
+      console.log("remote user left ", uid, "reason: ", reason)
+    })
+
+    this.client.on("stream-unpublished", (evt) => {
+      console.log(evt)
+    })
+  },
+
+  createLocalStream() {
+    this.localStream = AgoraRTC.createStream({
+      audio: true,
+      video: true,
+    });
+
+    // Initialize the local stream
+    this.localStream.init(
+      () => {
+        // Play the local stream
+        this.localStream.play("local-video")
+        // Publish the local stream
+        this.client.publish(this.localStream, (err) => {
+          console.log("publish local stream", err)
+        });
+      },
+      (err) => {
+        console.log(err)
+      }
+    )
+  },
+
+  endCall() {
+    this.localStream.close();
+    this.client.leave(
+      () => {
+        console.log("Leave channel successfully")
+        this.callPlaced = false;
+      },
+      (err) => {
+        console.log("Leave channel failed")
+      }
+    )
+    window.pusher.unsubscribe()
+  },
+
+  handleAudioToggle() {
+    if (this.mutedAudio) {
+      this.localStream.unmuteAudio()
+      this.mutedAudio = false
+    } else {
+      this.localStream.muteAudio()
+      this.mutedAudio = true
+    }
+  },
+
+  handleVideoToggle() {
+    if (this.mutedVideo) {
+      this.localStream.unmuteVideo()
+      this.mutedVideo = false
+    } else {
+      this.localStream.muteVideo()
+      this.mutedVideo = true
+    }
+  },
 }
-        
-    
 
-    
