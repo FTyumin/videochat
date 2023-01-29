@@ -1,4 +1,4 @@
-const app = {
+export const app = {
   data:{
     callPlaced: false,
     client: null,

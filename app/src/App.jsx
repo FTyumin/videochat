@@ -1,3 +1,5 @@
+import { app } from ".";
+
 function App() {
   
   
@@ -19,13 +21,30 @@ function App() {
           <div className="row">
             <div className="col">
               <div className="btn-group" role="group">
+              {allUsers.map((singleUser) => {
+                return <div key={singleUser.id}>{singleUser.name}</div>
               
+                })}
                 <button
                   type="button"
                   class="btn btn-primary mr-2"
-                ></button>
+                  onClick={placeCall('{{singleUser.id}}','{{singleUser}}')}
+                  >
+                    Call {singleUser}
+                
+                  <span className="badge badge-light">
+                    {getUserOnlineStatus(singleUser.id)}
+
+                  </span>
+                </button>
+                
               </div>  
             </div>
+          </div>
+
+          {/*Incoming Call */}
+          <div className="row my-5" >
+
           </div>
         </div>
 
