@@ -83,6 +83,65 @@ methods:
     return "Online";
   },
 
+  async placeCall(id, calleeName) {
+    try {
+      // channelName = the caller's and the caller's id. 
+      const channelName = `${AUTH_USER}_${calleeName}`;
+      const tokenRes = await this.generateToken(channelName);
+
+      let placeCallRes = await axios.post(
+        "/call-user/",
+        {
+          user_to_call: id,
+          channel_name: channelName,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": CSRF_TOKEN,
+          },
+        }
+      );
+
+      this.InitializeAgora(tokenRes.data.appID)
+      this.joinRoom(tokenRes.data.token, channelName)
+    } catch(error){
+      console.log(error)
+    }
+
+  },
+
+  async acceptCall() {
+    const tokenRes = await this.generateToken(this.agoraChannel);
+    this.initializeAgora(tokenRes.data.appID);
+
+    this.joinRoom(tokenRes.data.token, this.agoraChannel);
+    this.incomingCall = false;
+    this.callPlaced = true;
+  },
+
+  declineCall() {
+    // Send a request to the caller about rejected call
+    this.incomingCall = false;
+  },
+
+  generateToken(channelName) {
+    return axios.post(
+      "/token/",
+      {
+        channelName,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": CSRF_TOKEN,
+        },
+      }
+    );
+  },
+
+
+
 
 
     
